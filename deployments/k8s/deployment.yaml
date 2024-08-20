@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: connect-hub
-        image: <your-docker-image>
+        image: skylabworld/connect-hub
         ports:
         - containerPort: 8080
         envFrom:
