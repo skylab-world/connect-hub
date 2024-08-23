@@ -19,7 +19,7 @@ go_library(
 )
 
 go_test(
-    name = "cloudops_tests",
+    name = "connecthub_tests",
     size = "small",  # Options: small, medium, large, enormous
     timeout = "short",  # Options: short, moderate, long, eternal
     srcs = glob(["**/*_test.go"]),  # Automatically include all _test.go files in current and subdirectories
