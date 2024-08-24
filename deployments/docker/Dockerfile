@@ -1,16 +1,34 @@
-# Dockerfile
-FROM golang:1.18-alpine
+# Use the official Go image as the base image
+FROM golang:1.21-bullseye AS builder
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies
 RUN go mod download
 
-COPY . ./
+# Copy the source code into the container
+COPY . /app
 
-RUN go build -o main ./cmd/main.go
+# Run tests
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -v ./...
 
-EXPOSE 8080
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o connect-hub ./cmd
 
-CMD ["./main"]
+# Start a new stage from scratch
+FROM alpine:latest  
+
+# Install ca-certificates for HTTPS
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the pre-built binary file from the previous stage
+COPY --from=builder /app/connect-hub .
+
+# Command to run the application
+CMD ["./connect-hub"]
